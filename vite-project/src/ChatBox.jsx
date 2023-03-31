@@ -1,9 +1,12 @@
 import React from "react";
 import { useEffect, useRef, useState } from "react";
 import Badge from 'react-bootstrap/Badge';
-
+import { getAuth } from "firebase/auth";
+import { fetchChatFromFIreStore } from "./fetchChatFromFIreStore";
 import "./App.css";
 import axios from "axios";
+import { getDoc, setDoc, query, where, collection, getDocs, doc, arrayUnion, updateDoc, DocumentReference } from "firebase/firestore";
+import { db } from "./main";
 
 const YOU = "you";
 const AI = "ai";
@@ -17,11 +20,30 @@ function ChatBox() {
     const [qna, setQna] = useState([]);
     const [loading, setLoading] = useState(false);
 
+    const auth = getAuth()
+
     useEffect(() => {
+        
         bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
     }, [qna]);
 
-    const updateQNA = (from, value) => {
+    const updateChat = (from, value) => {
+        const q = query(collection(db, "users"), where("uid", "==", auth.currentUser.uid))
+        
+        getDocs(q).then((res) => {
+            res.forEach((document) => {
+                // console.log(doc.data())
+                console.log('working')
+                const docRef= doc(db,'users',document.id)
+                updateDoc(docRef, {
+                    "chat": arrayUnion({ from, value })
+                }).then((res) => { console.log('chat updated') }).catch((err) => { console.log(err.message) })
+                console.log('working here too')
+                const doc_id = document.id
+
+            })
+        }).catch((err) => { console.log(err.message) })
+
         setQna((qna) => [...qna, { from, value }]);
     };
     const handleSetQuestion = (e) => {
@@ -29,8 +51,7 @@ function ChatBox() {
     }
     const handleSend = (e) => {
         console.log('handleSend Called')
-
-        updateQNA(YOU, question);
+        updateChat(YOU, question);
 
         setLoading(true);
         axios
@@ -38,7 +59,8 @@ function ChatBox() {
                 question,
             })
             .then((response) => {
-                updateQNA(AI, response.data.answer);
+                updateChat(AI, response.data.answer);
+                // setQna(fetchChatFromFIreStore())
             })
             .finally(() => {
                 setLoading(false);
@@ -109,9 +131,9 @@ function ChatBox() {
                     }}>
                     </input>
                 </div>
-                <div disabled={loading} onClick={handleSend} style={{maxWidth:"10%",cursor: "pointer"}}class="w-25 d-flex justify-content-center align-items-center fs-1 ">
+                <div disabled={loading} onClick={handleSend} style={{ maxWidth: "10%", cursor: "pointer" }} class="w-25 d-flex justify-content-center align-items-center fs-1 ">
 
-                    <span  class="material-symbols-outlined " style={{transform:"rotate(-35deg)"}} >
+                    <span class="material-symbols-outlined " style={{ transform: "rotate(-35deg)" }} >
                         send
                     </span>
                 </div>

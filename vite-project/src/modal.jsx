@@ -4,6 +4,8 @@ import Button from 'react-bootstrap/Button';
 import ChatBox from './ChatBox';
 import AuthPage from './Login-SignUp_Page/AuthPage';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
+import { addDoc, collection, CollectionReference } from 'firebase/firestore';
+import { db } from './main';
 export const ChatModal = (props) => {
     const [loggedIn, setLoggedIn] = useState(null)
 
@@ -30,7 +32,13 @@ export const ChatModal = (props) => {
         auth.signOut()
 
     }
-
+    // const handleAddDoc = (event) => {
+    //     // const auth=getAuth()
+    //     event.preventDefault()
+    //     console.log('Before addDoc')
+    //     addDoc(collection(db, 'users'), { "chat": [], "site_id": "" }, `${uid}`).then((res) => { console.log(res.id) }).catch((err) => { console.log(err.message) })
+    //     console.log('after addDoc')
+    // }
     return (
         <Modal
             {...props}
@@ -46,7 +54,7 @@ export const ChatModal = (props) => {
 
                 {loggedIn && <button style={{ cursor: "pointer", top: "3%", right: "3%", position: "absolute" }} onClick={handleSignout}>Sign-Out</button>}
 
-               
+
             </Modal.Header>
             <Modal.Body style={{
                 maxHeight: 'calc(100vh - 210px)',
@@ -57,6 +65,7 @@ export const ChatModal = (props) => {
             </Modal.Body>
             <Modal.Footer>
                 <Button onClick={props.onHide} class="alert" style={{ cursor: "pointer" }}>Close</Button>
+                {/* <button onClick={handleAddDoc}>AddDoc</button> */}
             </Modal.Footer>
         </Modal>
     )
