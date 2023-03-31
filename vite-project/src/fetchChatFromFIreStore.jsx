@@ -7,7 +7,8 @@ export const fetchChatFromFIreStore = () => {
     const auth = getAuth()
 
     const q = query(collection(db, "users"), where("uid", "==", auth.currentUser.uid))
-
+    console.log(auth.currentUser.uid)
+    
     getDocs(q).then((res) => {
         res.forEach((document) => {
             const docRef = doc(db, 'users', document.id)

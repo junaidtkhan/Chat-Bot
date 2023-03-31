@@ -6,9 +6,10 @@ import AuthPage from './Login-SignUp_Page/AuthPage';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { addDoc, collection, CollectionReference } from 'firebase/firestore';
 import { db } from './main';
+import { fetchChatFromFIreStore } from './fetchChatFromFIreStore';
 export const ChatModal = (props) => {
     const [loggedIn, setLoggedIn] = useState(null)
-
+    const [chat, setChat] = useState([])
     const auth = getAuth();
     useEffect(() => {
 
@@ -39,6 +40,9 @@ export const ChatModal = (props) => {
     //     addDoc(collection(db, 'users'), { "chat": [], "site_id": "" }, `${uid}`).then((res) => { console.log(res.id) }).catch((err) => { console.log(err.message) })
     //     console.log('after addDoc')
     // }
+    const handleChatHistory = () => {
+        const chat = fetchChatFromFIreStore()
+    }
     return (
         <Modal
             {...props}
@@ -52,7 +56,14 @@ export const ChatModal = (props) => {
                     Dobby
                 </Modal.Title>
 
-                {loggedIn && <button style={{ cursor: "pointer", top: "3%", right: "3%", position: "absolute" }} onClick={handleSignout}>Sign-Out</button>}
+                {loggedIn && <div style={{display:'flex'}}>
+
+                    <button style={{ cursor: "pointer", top: "3%", right: "3%", position: "absolute" }} onClick={handleSignout}>Sign-Out</button>
+
+                    {/* <button style={{ cursor: "pointer", top: "3%", right: "3%", position: "absolute" }} onClick={handleChatHistory}>Chat History</button> */}
+                </div>
+                }
+
 
 
             </Modal.Header>
