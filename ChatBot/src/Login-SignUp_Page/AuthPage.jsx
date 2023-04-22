@@ -8,26 +8,23 @@ const AuthPage = () => {
     const [accountExist, setAccountExist] = useState(false)
     
 
-    const auth = getAuth();
-    onAuthStateChanged(auth, (user) => {
-        if (user) {
+    // const auth = getAuth();
+    // onAuthStateChanged(auth, (user) => {
+    //     if (user) {
             
-            console.log('AuthPage')
-            console.log(user.email)
-        } else {
-            console.log('user logged out')
-        }
-    });
+    //         console.log('AuthPage')
+    //         console.log(user.email)
+    //     } else {
+    //         console.log('user logged out')
+    //     }
+    // });
 
     const setLoginHandler = (event) => {
         event.preventDefault()
+        //to switch between sign-up and log-in page
         setAccountExist(!accountExist)
     }
-   
-    const handleSignout=(event)=>{
-        event.preventDefault()
-        auth.signOut()
-    }
+
     return (
         <div style={{ display: 'flex', flexDirection: "column", justifyContent: 'center', alignItems: "center" }} >
 
@@ -35,7 +32,6 @@ const AuthPage = () => {
 
                 {!accountExist && <SignupPage />}
                 {accountExist && <LoginPage />}
-                {/* <button onClick={handleSignout}>sign out</button> */}
             </div>
 
             <div>

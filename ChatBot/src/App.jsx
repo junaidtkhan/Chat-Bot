@@ -1,32 +1,31 @@
 import React, { useEffect } from 'react';
 import { useState } from 'react';
 import { ChatModal } from './modal';
-import AuthPage from './Login-SignUp_Page/AuthPage'
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 const App = () => {
   const [modalShow, setModalShow] = React.useState(false);
-  const [loggedIn, setLoggedIn] = useState(null)
+  // const [loggedIn, setLoggedIn] = useState(null)
 
-  const auth = getAuth();
-  useEffect(() => {
+  // const auth = getAuth();
+  // useEffect(() => {
 
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        setLoggedIn(true)
-        console.log("user logged in")
+  //   onAuthStateChanged(auth, (user) => {
+  //     if (user) {
+  //       setLoggedIn(true)
+  //       console.log("user logged in")
 
-      } else {
-        setLoggedIn(false)
-        //..
-      }
-    });
+  //     } else {
+  //       setLoggedIn(false)
+  //       //..
+  //     }
+  //   });
 
-  }, [])
+  // }, [])
 
 
   return (
     <div>
-
+      {/* //Chat icon */}
       {!modalShow && <div style={{ bottom: "3%", right: "3%", position: "absolute", cursor: "pointer" }} onClick={() => setModalShow(true)}>
 
         <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="currentColor" class="bi bi-chat-text" viewBox="0 0 16 16">
@@ -35,7 +34,7 @@ const App = () => {
         </svg>
       </div>}
 
-
+      {/* chat modal */}
       <ChatModal
         show={modalShow}
         onHide={() => setModalShow(false)}

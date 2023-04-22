@@ -17,6 +17,7 @@ app.get("/ping", (req, res) => {
     message: "pong",
   });
 });
+
 app.post("/chat", (req, res) => {
   const question = req.body.question;
 

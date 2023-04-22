@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
-
+import { new_user } from '../FireStore';
+import { addDoc, collection, CollectionReference } from 'firebase/firestore';
+import { db } from '../main';
+import { doc } from 'firebase/firestore';
 function SignupPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -24,19 +27,20 @@ function SignupPage() {
     if (password === confirmPassword) {
 
       const auth = getAuth();
+      //create a new user with email and password
       createUserWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
           // Signed in 
-          const user = userCredential.user;
-          console.log('User created',user)
+
+          //create a document for new user just signed-up
+          addDoc(collection(db, 'users'), { "uid": `${userCredential.user.uid}`, "chat": [], "site_id": "" }).then((res) => { console.log(res.id) }).catch((err) => { console.log(err.message) })
         })
         .catch((error) => {
-          const errorCode = error.code;
-          const errorMessage = error.message;
+         console.log(error.message)
           // ..
         });
     }
-    else{
+    else {
       alert('password and confirm password are not same. plz Enter again.')
     }
   }
@@ -72,7 +76,7 @@ function SignupPage() {
             onChange={handleConfirmPasswordChange}
           />
         </div>
-        <button style={{cursor:"pointer"}} type="submit">Signup</button>
+        <button style={{ cursor: "pointer" }} type="submit">Signup</button>
       </form>
     </div>
   );

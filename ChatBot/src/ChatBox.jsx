@@ -1,9 +1,20 @@
 import React from "react";
 import { useEffect, useRef, useState } from "react";
 import Badge from 'react-bootstrap/Badge';
-
+import { getAuth } from "firebase/auth";
+import { fetchChatFromFIreStore } from "./fetchChatFromFIreStore";
 import "./App.css";
 import axios from "axios";
+import { getDoc, setDoc, query, where, collection, getDocs, doc, arrayUnion, updateDoc, DocumentReference } from "firebase/firestore";
+import { db } from "./main";
+
+import { OPENAI_API_KEY } from './OpenAI_Key'
+import { Configuration, OpenAIApi } from 'openai'
+// const { Configuration, OpenAIApi } = require("openai");
+const configuration = new Configuration({
+    apiKey: OPENAI_API_KEY,
+});
+const openai = new OpenAIApi(configuration);
 
 const YOU = "you";
 const AI = "ai";
@@ -17,11 +28,30 @@ function ChatBox() {
     const [qna, setQna] = useState([]);
     const [loading, setLoading] = useState(false);
 
+    const auth = getAuth()
+
     useEffect(() => {
+
         bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
     }, [qna]);
 
-    const updateQNA = (from, value) => {
+    const updateChat = (from, value) => {
+        const q = query(collection(db, "users"), where("uid", "==", auth.currentUser.uid))
+
+        getDocs(q).then((res) => {
+            res.forEach((document) => {
+                // console.log(doc.data())
+                console.log('working')
+                const docRef = doc(db, 'users', document.id)
+                updateDoc(docRef, {
+                    "chat": arrayUnion({ from, value })
+                }).then((res) => { console.log('chat updated') }).catch((err) => { console.log(err.message) })
+                console.log('working here too')
+                const doc_id = document.id
+
+            })
+        }).catch((err) => { console.log(err.message) })
+
         setQna((qna) => [...qna, { from, value }]);
     };
     const handleSetQuestion = (e) => {
@@ -30,19 +60,50 @@ function ChatBox() {
     const handleSend = (e) => {
         console.log('handleSend Called')
 
-        updateQNA(YOU, question);
+        updateChat(YOU, question);
 
         setLoading(true);
-        axios
-            .post("http://localhost:3000/chat", {
-                question,
+        openai
+            .createCompletion({
+                model: "text-davinci-003",
+                prompt: question,
+                max_tokens: 1000,
+                temperature: 0,
             })
             .then((response) => {
-                updateQNA(AI, response.data.answer);
+                console.log({ response });
+                return response?.data?.choices?.[0]?.text;
             })
-            .finally(() => {
+            .then((answer) => {
+                console.log({ answer });
+                const array = answer
+                    ?.split("\n")
+                    .filter((value) => value)
+                    .map((value) => value.trim());
+
+                return array;
+            })
+            .then((answer) => {
+                console.log("open AI answer recieved")
+                updateChat(AI, answer);
+                // res.json({
+                //     answer: answer,
+                //     propt: question,
+                // });
+            }).finally(() => {
                 setLoading(false);
-            });
+            })
+        // axios
+        //     .post("http://localhost:3000/chat", {
+        //         question,
+        //     })
+        //     .then((response) => {
+        //         updateChat(AI, response.data.answer);
+        //         // setQna(fetchChatFromFIreStore())
+        //     })
+        //     .finally(() => {
+        //         setLoading(false);
+        //     });
 
         setQuestion('')
     };
@@ -109,9 +170,9 @@ function ChatBox() {
                     }}>
                     </input>
                 </div>
-                <div disabled={loading} onClick={handleSend} style={{maxWidth:"10%",cursor: "pointer"}}class="w-25 d-flex justify-content-center align-items-center fs-1 ">
+                <div disabled={loading} onClick={handleSend} style={{ maxWidth: "10%", cursor: "pointer" }} class="w-25 d-flex justify-content-center align-items-center fs-1 ">
 
-                    <span  class="material-symbols-outlined " style={{transform:"rotate(-35deg)"}} >
+                    <span class="material-symbols-outlined " style={{ transform: "rotate(-35deg)" }} >
                         send
                     </span>
                 </div>
