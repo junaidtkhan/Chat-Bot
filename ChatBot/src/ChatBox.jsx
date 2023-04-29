@@ -8,8 +8,11 @@ import axios from "axios";
 import { getDoc, setDoc, query, where, collection, getDocs, doc, arrayUnion, updateDoc, DocumentReference } from "firebase/firestore";
 import { db } from "./main";
 
-import { OPENAI_API_KEY } from './OpenAI_Key'
 import { Configuration, OpenAIApi } from 'openai'
+
+//import your own openai key from openai website
+import { OPENAI_API_KEY } from './OpenAI_Key'
+
 // const { Configuration, OpenAIApi } = require("openai");
 const configuration = new Configuration({
     apiKey: OPENAI_API_KEY,
